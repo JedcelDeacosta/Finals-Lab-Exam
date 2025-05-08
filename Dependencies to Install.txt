@@ -1,0 +1,6 @@
+Vue js 
+- npm install
+
+Django 
+
+- pip install django djangorestframework django-cors-headers mysqlclient
