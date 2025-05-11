@@ -176,3 +176,28 @@
     </div>
   </div>
 </template>
+
+<script>
+import axios from "axios";
+
+export default {
+  name: "ReturnBook",
+  data() {
+    return {
+      returnData: {
+        transaction_id: "",
+      },
+      borrowedBooks: [],
+      recentReturns: [],
+      loading: false,
+      loadingTransactions: false,
+      error: "",
+      success: "",
+    };
+  },
+  created() {
+    this.fetchBorrowedBooks();
+    this.fetchRecentReturns();
+  },
+};
+</script>
