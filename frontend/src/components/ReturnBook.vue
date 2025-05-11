@@ -199,5 +199,21 @@ export default {
     this.fetchBorrowedBooks();
     this.fetchRecentReturns();
   },
+  methods: {
+    async fetchBorrowedBooks() {
+      this.loading = true;
+      try {
+        const response = await axios.get("transactions/");
+        this.borrowedBooks = response.data.filter(
+          (t) => t.status === "borrowed"
+        );
+      } catch (error) {
+        console.error("Error fetching borrowed books:", error);
+        this.error = "Failed to load borrowed books. Please try again.";
+      } finally {
+        this.loading = false;
+      }
+    },
+  },
 };
 </script>
