@@ -29,3 +29,18 @@ class BookListCreate(ListCreateAPIView):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
     permission_classes = []
+
+class BookRetrieveUpdateDestroy(RetrieveUpdateDestroyAPIView):
+    queryset = Book.objects.all()
+    serializer_class = BookSerializer
+    permission_classes = []
+    
+    def destroy(self, request, *args, **kwargs):
+        book = self.get_object()
+        # Check if there are any active borrow records
+        if BorrowTransaction.objects.filter(book=book, status='borrowed').exists():
+            return Response(
+                {"error": "Cannot delete book with active borrow records"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        return super().destroy(request, *args, **kwargs)
