@@ -65,14 +65,19 @@ class BorrowBookView(APIView):
                 user = serializer.validated_data['user']
                 book = serializer.validated_data['book']
             
-
-            
       # Check again if book is available (for race conditions)
                 if book.copies_available <= 0:
                     return Response(
                         {"error": "No copies available for borrowing"},
                         status=status.HTTP_400_BAD_REQUEST
-                    )
+                    )       
+                # Create borrow transaction
+                borrow_transaction = BorrowTransaction.objects.create(
+                    user=user,
+                    book=book,
+                    status='borrowed'
+                )
+                
                 
                 # Update book copies
                 book.copies_available -= 1
@@ -108,18 +113,3 @@ class BorrowBookView(APIView):
                     status=status.HTTP_200_OK
                 )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-
-      # Check again if book is available (for race conditions)
-                if book.copies_available <= 0:
-                    return Response(
-                        {"error": "No copies available for borrowing"},
-                        status=status.HTTP_400_BAD_REQUEST
-                    )
-                
-                # Create borrow transaction
-                borrow_transaction = BorrowTransaction.objects.create(
-                    user=user,
-                    book=book,
-                    status='borrowed'
-                )
