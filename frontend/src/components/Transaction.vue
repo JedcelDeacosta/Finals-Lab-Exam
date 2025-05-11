@@ -227,3 +227,28 @@
     </div>
   </div>
 </template>
+<style scoped>
+.book-icon,
+.user-icon {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #e9ecef;
+  border-radius: 4px;
+}
+
+.table th {
+  font-weight: 600;
+}
+
+.table td {
+  vertical-align: middle;
+}
+
+.btn-group .btn {
+  display: flex;
+  align-items: center;
+}
+</style>
