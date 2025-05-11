@@ -215,6 +215,20 @@ export default {
       }
     },
 
+    async fetchRecentReturns() {
+      this.loadingTransactions = true;
+      try {
+        const response = await axios.get("transactions/");
+        this.recentReturns = response.data
+          .filter((t) => t.status === "returned")
+          .slice(0, 5);
+      } catch (error) {
+        console.error("Error fetching transactions:", error);
+      } finally {
+        this.loadingTransactions = false;
+      }
+    },
+
     async returnBook() {
       this.loading = true;
       this.error = "";
