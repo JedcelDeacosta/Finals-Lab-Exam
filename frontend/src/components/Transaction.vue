@@ -227,6 +227,55 @@
     </div>
   </div>
 </template>
+
+<script>
+import axios from "axios";
+
+export default {
+  name: "Transactions",
+  data() {
+    return {
+      transactions: [],
+      loading: true,
+      error: null,
+      filter: "all",
+      searchQuery: "",
+    };
+  },
+  computed: {
+    filteredTransactions() {
+      let result = this.transactions;
+
+      // Apply status filter
+      if (this.filter !== "all") {
+        result = result.filter((t) => t.status === this.filter);
+      }
+
+      // Apply search filter
+      if (this.searchQuery.trim()) {
+        const query = this.searchQuery.toLowerCase();
+        result = result.filter(
+          (t) =>
+            t.book_title.toLowerCase().includes(query) ||
+            t.user_name.toLowerCase().includes(query)
+        );
+      }
+
+      return result;
+    },
+    borrowedCount() {
+      return this.transactions.filter((t) => t.status === "borrowed").length;
+    },
+    returnedCount() {
+      return this.transactions.filter((t) => t.status === "returned").length;
+    },
+  },
+  created() {
+    this.fetchTransactions();
+  },
+};
+</script>
+
 <style scoped>
 .book-icon,
 .user-icon {
