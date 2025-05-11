@@ -54,3 +54,38 @@ class BookRetrieveUpdateDestroy(RetrieveUpdateDestroyAPIView):
         serializer = BorrowTransactionSerializer(transactions, many=True)
         return Response(serializer.data)
     
+    # Replace decorated functions with class-based views
+class BorrowBookView(APIView):
+    permission_classes = []
+    
+    def post(self, request):
+        serializer = BorrowBookSerializer(data=request.data)
+        if serializer.is_valid():
+            with transaction.atomic():
+                user = serializer.validated_data['user']
+                book = serializer.validated_data['book']
+                
+                # Check again if book is available (for race conditions)
+                if book.copies_available <= 0:
+                    return Response(
+                        {"error": "No copies available for borrowing"},
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
+                
+                # Create borrow transaction
+                borrow_transaction = BorrowTransaction.objects.create(
+                    user=user,
+                    book=book,
+                    status='borrowed'
+                )
+                
+                # Update book copies
+                book.copies_available -= 1
+                book.save()
+                
+                return Response(
+                    BorrowTransactionSerializer(borrow_transaction).data,
+                    status=status.HTTP_201_CREATED
+                )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
