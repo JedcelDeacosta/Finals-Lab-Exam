@@ -64,6 +64,57 @@
           </div>
         </div>
       </div>
-    </div>
-    </div>
+    <div class="card shadow-sm">
+      <div class="card-header bg-white">
+        <div class="row align-items-center">
+          <div class="col-md-6 mb-3 mb-md-0">
+            <div class="btn-group">
+              <button
+                class="btn"
+                :class="{
+                  'btn-primary': filter === 'all',
+                  'btn-outline-primary': filter !== 'all',
+                }"
+                @click="filter = 'all'"
+              >
+                <i class="bi bi-grid me-1"></i>All
+              </button>
+              <button
+                class="btn"
+                :class="{
+                  'btn-warning': filter === 'borrowed',
+                  'btn-outline-warning': filter !== 'borrowed',
+                }"
+                @click="filter = 'borrowed'"
+              >
+                <i class="bi bi-arrow-right me-1"></i>Borrowed
+              </button>
+              <button
+                class="btn"
+                :class="{
+                  'btn-success': filter === 'returned',
+                  'btn-outline-success': filter !== 'returned',
+                }"
+                @click="filter = 'returned'"
+              >
+                <i class="bi bi-arrow-return-left me-1"></i>Returned
+              </button>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="input-group">
+              <span class="input-group-text bg-light">
+                <i class="bi bi-search"></i>
+              </span>
+              <input
+                type="text"
+                class="form-control"
+                placeholder="Search by book title or username..."
+                v-model="searchQuery"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
     </template>
