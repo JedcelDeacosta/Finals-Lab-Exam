@@ -214,6 +214,46 @@ export default {
         this.loading = false;
       }
     },
+
+    async returnBook() {
+      this.loading = true;
+      this.error = "";
+      this.success = "";
+
+      try {
+        await axios.post("return/", this.returnData);
+
+        this.success = "Book returned successfully!";
+        this.returnData.transaction_id = "";
+
+        // Refresh data
+        this.fetchBorrowedBooks();
+        this.fetchRecentReturns();
+      } catch (error) {
+        console.error("Error returning book:", error);
+        if (
+          error.response &&
+          error.response.data &&
+          error.response.data.error
+        ) {
+          this.error = error.response.data.error;
+        } else {
+          this.error = "Failed to return book. Please try again.";
+        }
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    formatDate(dateString) {
+      if (!dateString) return "N/A";
+      const date = new Date(dateString);
+      return date.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      });
+    },
   },
 };
 </script>
