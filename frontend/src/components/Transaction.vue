@@ -273,6 +273,61 @@ export default {
   created() {
     this.fetchTransactions();
   },
+  methods: {
+    async fetchTransactions() {
+      this.loading = true;
+      this.error = null;
+
+      try {
+        const response = await axios.get("transactions/");
+        this.transactions = response.data;
+      } catch (error) {
+        console.error("Error fetching transactions:", error);
+        this.error = "Failed to load transactions. Please try again.";
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    formatDate(dateString, includeTime = false) {
+      if (!dateString) return "N/A";
+      const date = new Date(dateString);
+
+      if (includeTime) {
+        return date.toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+      }
+
+      return date.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      });
+    },
+
+    calculateDuration(transaction) {
+      const borrowDate = new Date(transaction.borrow_date);
+      const returnDate = transaction.return_date
+        ? new Date(transaction.return_date)
+        : new Date();
+
+      const diffTime = Math.abs(returnDate - borrowDate);
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+      if (diffDays === 0) {
+        return "Same day";
+      } else if (diffDays === 1) {
+        return "1 day";
+      } else {
+        return `${diffDays} days`;
+      }
+    },
+  },
 };
 </script>
 
