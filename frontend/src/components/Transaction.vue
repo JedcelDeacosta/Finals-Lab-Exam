@@ -64,6 +64,8 @@
           </div>
         </div>
       </div>
+    </div>
+
     <div class="card shadow-sm">
       <div class="card-header bg-white">
         <div class="row align-items-center">
@@ -117,7 +119,7 @@
           </div>
         </div>
       </div>
-      
+
       <div class="card-body p-0">
         <div v-if="loading" class="text-center my-5">
           <div class="spinner-border text-primary" role="status">
@@ -224,4 +226,4 @@
       </div>
     </div>
   </div>
-    </template>
+</template>
