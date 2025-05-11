@@ -89,3 +89,27 @@ class BorrowBookView(APIView):
                 )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
+    class ReturnBookView(APIView):
+      permission_classes = []
+    
+    def post(self, request):
+        serializer = ReturnBookSerializer(data=request.data)
+        if serializer.is_valid():
+            with transaction.atomic():
+                borrow_transaction = serializer.validated_data['id']
+                
+                # Update transaction
+                borrow_transaction.status = 'returned'
+                borrow_transaction.return_date = timezone.now()
+                borrow_transaction.save()
+                
+                # Update book copies
+                book = borrow_transaction.book
+                book.copies_available += 1
+                book.save()
+                
+                return Response(
+                    BorrowTransactionSerializer(borrow_transaction).data,
+                    status=status.HTTP_200_OK
+                )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
