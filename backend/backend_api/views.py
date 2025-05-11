@@ -72,7 +72,12 @@ class BorrowBookView(APIView):
                         status=status.HTTP_400_BAD_REQUEST
                     )
                 
-        
+                # Create borrow transaction
+                borrow_transaction = BorrowTransaction.objects.create(
+                    user=user,
+                    book=book,
+                    status='borrowed'
+                )
                 
                 # Update book copies
                 book.copies_available -= 1
@@ -83,11 +88,4 @@ class BorrowBookView(APIView):
                     status=status.HTTP_201_CREATED
                 )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-        # Create borrow transaction
-                borrow_transaction = BorrowTransaction.objects.create(
-                    user=user,
-                    book=book,
-                    status='borrowed'
-                )
     
