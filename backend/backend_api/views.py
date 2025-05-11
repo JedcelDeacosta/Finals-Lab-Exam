@@ -84,3 +84,10 @@ class BorrowBookView(APIView):
                 )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
+        # Create borrow transaction
+                borrow_transaction = BorrowTransaction.objects.create(
+                    user=user,
+                    book=book,
+                    status='borrowed'
+                )
+    
