@@ -44,3 +44,13 @@ class BookRetrieveUpdateDestroy(RetrieveUpdateDestroyAPIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
         return super().destroy(request, *args, **kwargs)
+    
+# Replace ViewSet with class-based view for Transactions
+    class TransactionList(APIView):
+     permission_classes = []
+    
+    def get(self, request):
+        transactions = BorrowTransaction.objects.all().order_by('-borrow_date')
+        serializer = BorrowTransactionSerializer(transactions, many=True)
+        return Response(serializer.data)
+    
