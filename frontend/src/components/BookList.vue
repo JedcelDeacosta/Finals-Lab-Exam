@@ -170,7 +170,12 @@
                   <button
                     class="btn btn-sm btn-outline-primary"
                     @click="editBook(book)"
-                    title="Edit Book"
+                    :disabled="book.copies_available < book.total_copies"
+                    :title="
+                      book.copies_available < book.total_copies
+                        ? 'Cannot edit while copies are borrowed'
+                        : 'Edit Book'
+                    "
                   >
                     <i class="bi bi-pencil"></i>
                   </button>
@@ -183,6 +188,12 @@
                     <i class="bi bi-trash"></i>
                   </button>
                 </div>
+                <small
+                  v-if="book.copies_available < book.total_copies"
+                  class="d-block text-danger mt-1"
+                >
+                  <i class="bi bi-info-circle"></i> Book has borrowed copies
+                </small>
               </td>
             </tr>
           </tbody>
@@ -219,6 +230,11 @@
             ></button>
           </div>
           <div class="modal-body">
+            <!-- Display update error message -->
+            <div v-if="updateError" class="alert alert-danger mb-3">
+              <i class="bi bi-exclamation-triangle me-2"></i>{{ updateError }}
+            </div>
+
             <form @submit.prevent="saveBook">
               <div class="mb-3">
                 <label for="title" class="form-label">Title</label>
@@ -382,6 +398,7 @@ export default {
       books: [],
       loading: true,
       error: null,
+      updateError: "", // Added to store update-specific errors
       bookModal: null,
       deleteModal: null,
       currentBook: {
@@ -445,6 +462,7 @@ export default {
 
     openAddBookModal() {
       this.isEditing = false;
+      this.updateError = ""; // Clear any previous errors
       this.currentBook = {
         title: "",
         author: "",
@@ -455,13 +473,23 @@ export default {
     },
 
     editBook(book) {
+      // Check if book has borrowed copies
+      if (book.copies_available < book.total_copies) {
+        alert(
+          "Cannot edit book while copies are borrowed. All copies must be returned first."
+        );
+        return;
+      }
+
       this.isEditing = true;
+      this.updateError = ""; // Clear any previous errors
       this.currentBook = { ...book };
       this.bookModal.show();
     },
 
     async saveBook() {
       this.saving = true;
+      this.updateError = ""; // Clear any previous errors
 
       try {
         if (this.isEditing) {
@@ -474,7 +502,18 @@ export default {
         this.fetchBooks();
       } catch (error) {
         console.error("Error saving book:", error);
-        alert("Failed to save book. Please check the form and try again.");
+
+        if (error.response && error.response.status === 400) {
+          if (error.response.data && error.response.data.error) {
+            // Display the specific error message from the backend
+            this.updateError = error.response.data.error;
+          } else {
+            this.updateError = "Failed to save book due to validation errors.";
+          }
+        } else {
+          this.updateError =
+            "Failed to save book. Please check the form and try again.";
+        }
       } finally {
         this.saving = false;
       }
@@ -495,7 +534,10 @@ export default {
       } catch (error) {
         console.error("Error deleting book:", error);
         if (error.response && error.response.status === 400) {
-          alert("Cannot delete book with active borrow records");
+          alert(
+            error.response.data.error ||
+              "Cannot delete book with active borrow records"
+          );
         } else {
           alert("Failed to delete book. Please try again.");
         }

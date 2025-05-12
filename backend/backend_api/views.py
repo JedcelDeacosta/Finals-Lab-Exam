@@ -35,6 +35,16 @@ class BookRetrieveUpdateDestroy(RetrieveUpdateDestroyAPIView):
     serializer_class = BookSerializer
     permission_classes = []
     
+    def update(self, request, *args, **kwargs):
+        book = self.get_object()
+        # Check if there are any active borrow records
+        if BorrowTransaction.objects.filter(book=book, status='borrowed').exists():
+            return Response(
+                {"error": "Cannot update book with active borrow records. All copies must be returned first."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        return super().update(request, *args, **kwargs)
+    
     def destroy(self, request, *args, **kwargs):
         book = self.get_object()
         # Check if there are any active borrow records

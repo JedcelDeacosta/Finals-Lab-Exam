@@ -3,7 +3,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import BookList from "../components/BookList.vue";
 import BorrowBook from "../components/BorrowBook.vue";
 import ReturnBook from "../components/ReturnBook.vue";
-import Transactions from "../components/Transactions.vue";
+import Transactions from "../components/Transaction.vue";
 
 const routes = [
   {
